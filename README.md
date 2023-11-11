@@ -1,2 +1,2 @@
-# buffet
-Buffet stands for Building Units For Framework Engineering in Testing
+# Tarkash
+A collection of build blocks for automation in testing, to be used with or without Arjuna.
