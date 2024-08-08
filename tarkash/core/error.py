@@ -1,5 +1,5 @@
-# This file is a part of Arjuna
-# Copyright 2015-2021 Rahul Verma
+# This file is a part of Tarkash
+# Copyright 2015-2024 Rahul Verma
 
 # Website: www.RahulVerma.net
 
@@ -40,7 +40,7 @@ class TarkashError(Exception):
         traces = " ".join([append_dot(m.strip()) for m in tobj.traces if m.strip()])
         if traces:
             traces = "Additional Info: " + traces
-        super().__init__(f"{tobj.klass}::{tobj.name}:: {message} {traces}")
+        super().__init__(f"{tobj.klass}::{tobj.purpose}:: {message} {traces}")
 
 
 class CorruptStateError(TarkashError):

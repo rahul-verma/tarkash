@@ -1,5 +1,5 @@
-# This file is a part of Arjuna
-# Copyright 2015-2021 Rahul Verma
+# This file is a part of Tarkash
+# Copyright 2015-2024 Rahul Verma
 
 # Website: www.RahulVerma.net
 
@@ -16,9 +16,16 @@
 # limitations under the License.
 
 import os
-from tarkash.core.tobj import TarkashObject
+from typing import List, Dict, Any, Optional
 
-class File(TarkashObject):
+from tarkash.core.tobj import TarkashObject
+from tarkash.type.descriptor import *
+
+class File(TarkashObject): 
+    _path = String(immutable=True)
+    _try_relative_path = Boolean(immutable=True)
+    _should_exist = Boolean(immutable=True)
+    
     """
     
     Base Class for all File Content as well as File Writer Classes
@@ -34,39 +41,69 @@ class File(TarkashObject):
     In addition to the above, you can pass the keyword arguments supported by TarkashObject e.g. name.
     """
     
-    def __init__(self, path: str, *, try_relative_path: bool = True, should_exist=False, **kwargs):
+    def __init__(self, path: str, *, should_exist: bool=False, try_relative_path: bool=True, **kwargs):
         """
         Initializes the FlatFileReader with the provided file path and try_relative_path flag.
         """
         super().__init__(**kwargs)
-        self.__path = path
-        self.__try_relative_path = try_relative_path
-        self.__should_exist = should_exist
-        self.__exists = False
-        self.__relative = False
-        self.__full_path = "NOT_SET"
+        self._path = path
+        self._should_exist = should_exist
+        self._try_relative_path = try_relative_path
+        self._exists = False
+        self._relative = False
+        self._full_path = "NOT_SET"
         self.__determine_file_path()
-
+        
     @property
-    def path(self) -> str:
+    def path(self):
         """
-        Path of the file, as provided by caller.
+        Path to the file.
         
         Returns:
-            str: Path of the file.
+            str: Path to the file.
         """
-        return self.__path
+        return self._path
     
     @property
-    def full_path(self) -> str:
+    def try_relative_path(self):
         """
-        Full Path of the file. Useful if the caller-provided path is relative.
+        Flag to try out relative path.
         
         Returns:
-            str: Full Path of the file.
+            bool: True if relative path is tried out, else False.
         """
-        return self.__full_path
+        return self._try_relative_path
+    
+    @property
+    def should_exist(self):
+        """
+        Flag to check whether the file should exist.
         
+        Returns:
+            bool: True if the file should exist, else False.
+        """
+        return self._should_exist
+    
+    @property
+    def has_relative_path(self):
+        """
+        Checks whether the file path is relative.
+        
+        Returns:
+            bool: True if the file path is relative, else False.
+        """
+        return self._relative
+    
+    @property
+    def full_path(self):
+        """
+        Full path of the file.
+        
+        Returns:
+            str: Full path of the file.
+        """
+        return self._full_path
+    
     @property
     def exists(self):
         """
@@ -75,18 +112,18 @@ class File(TarkashObject):
         Returns:
             bool: True if the file exists, else False.
         """
-        return os.path.exists(self.__exists)
+        return os.path.exists(self._full_path)
     
     @property
-    def is_relative(self):
+    def is_file(self):
         """
-        Checks whether the file path is relative.
+        Checks whether the path is a file.
         
         Returns:
-            bool: True if the file path is relative, else False.
+            bool: True if the path is a file, else False.
         """
-        return self.__relative
-    
+        return os.path.exists(self._full_path) and os.path.isfile(self._full_path)
+
     def __convert_to_abs_path(self):
         """
         Populate full_path with absolute path.
@@ -96,39 +133,39 @@ class File(TarkashObject):
             1. If defined, from PROJECT_ROOT_DIR environment variable.
             2. Current working directory.
         """
-        if not base_path:
-            if os.environ.get("PROJECT_ROOT_DIR"):
-                base_path = os.environ.get("PROJECT_ROOT_DIR")
-            else:
-                base_path = os.getcwd()
+        if os.environ.get("PROJECT_ROOT_DIR"):
+            base_path = os.environ.get("PROJECT_ROOT_DIR")
+            self._traces.append(f"Found PROJECT_ROOT_DIR environment variable with value: {base_path}.")
+        else:
+            base_path = os.getcwd()
+            self._traces.append(f"As PROJECT_ROOT_DIR environment variable is not defined, base path is set to current working directory: {base_path}.")
             
-        return os.path.join(base_path, *rel_path_parts)
+        self._full_path = File.get_canonical_path(os.path.join(base_path, self.path))
     
     def __check_path_exists(self, file_path):
         from .error import IncorrectFilePathError
-        if not os.path.exists(self.__path): 
-            if self.__should_exist:
+        if not os.path.exists(self.path): 
+            self._traces.append(f"File path does not exist.")
+            if self.should_exist:
                 raise IncorrectFilePathError(self, f"The file does not exist.")
         
     def __determine_file_path(self):
         from .error import IncorrectFilePathError
-        self.traces.append(f"Checking whether the file path is correct.")
-        if os.path.isabs(self.__path):
-            self.__full_path = self.__path
-            self.__check_path_exists(self.__path)
-            file_path = self.__path
+        self._traces.append(f"Checking the caller-provided file path >>{self.path}<<")
+        if os.path.isabs(self.path):
+            self._full_path = self.path
+            self.__check_path_exists(self.path)
         else:
-            self.__relative = True
-            self.traces.append(f"It's a relative path.")
-            if not self.__try_relative_path:
-                if self.__should_exist:
+            self._relative = True
+            self._traces.append(f"It's a relative path.")
+            if not self._try_relative_path:
+                if self.should_exist:
                     raise IncorrectFilePathError(self, f"Expected absolute path (relative path might be correct but not relevant).")
             else:
-                self.traces.append(f"Converting to absolute path.")
+                self._traces.append(f"Converting to absolute path.")
                 self.__convert_to_abs_path()
-                self.__check_path_exists(file_path)
-        
-        return file_path
+                self._traces.append(f"Calculated path: >>{self._full_path}<<.")
+                self.__check_path_exists(self._full_path)
     
     @staticmethod
     def get_canonical_path(file_path):
@@ -147,8 +184,9 @@ class File(TarkashObject):
         props = TarkashObject.merge_properties(super(), {
             "path": self.path,
             "full_path": self.full_path,
-            "is_relative": self.is_relative,
-            "should_exist": self.__should_exist,
+            "has_relative_path": self.has_relative_path,
+            "is_file": self.is_file,
+            "should_exist": self.should_exist,
             "exists": self.exists
         })
         return props

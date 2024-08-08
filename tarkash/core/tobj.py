@@ -1,5 +1,5 @@
-# This file is a part of Arjuna
-# Copyright 2015-2021 Rahul Verma
+# This file is a part of Tarkash
+# Copyright 2015-2024 Rahul Verma
 
 # Website: www.RahulVerma.net
 
@@ -15,66 +15,69 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class TarkashObject:
-    """
-        Base class for all Tarkash objects in Tarkash.
-        
-        The purpose is to guarantee that all Tarkash objects have a some properties that can be utilised e.g. at the time of reporting exceptions etc.
-    """
-    def __init__(self, **kwargs):
-        self.__class = self.__module__ + "." + self.__class__.__name__
-        if "name" in kwargs:
-            self.__purpose = kwargs['name']
-        else:
-            self.__purpose = "NOT_SET"
-        self.__traces = []
+from tarkash.type.descriptor import *
+from typing import List, Dict, Any
 
+class TarkashObject:
+    _purpose: String()
+    _klass: str = String()
+    #_traces: List[str] = PrivateAttr(default_factory=list) 
+
+    # class Config:
+    #     arbitrary_types_allowed = True
+
+    def __init__(self, purpose:str = "NOT_SET", **kwargs):
+        self._klass = self.__module__ + "." + self.__class__.__name__
+        self._purpose = purpose
+        self._traces = []
+        
     @property
     def purpose(self) -> str:
         """
-            Name of the object.
+        Class of the object.
         """
-        return self.__purpose
-    
+        return self._purpose
+        
+        
     @property
     def klass(self) -> str:
         """
-            Class of the object.
+        Class of the object.
         """
-        return self.__class
+        return self._klass
     
     @property
-    def meta(self) -> dict:
+    def traces(self) -> List[str]:
         """
-            Tarkash Properties of the object as a dictionary.
+        Trace messages associated with the object.
+        """
+        return tuple(self._traces)
+
+    @property
+    def meta(self) -> Dict[str, Any]:
+        """
+        Tarkash Properties of the object as a dictionary.
         """
         return {
             "purpose": self.purpose,
             "class": self.klass
-        }   
-        
-    @property
-    def traces(self) -> str:
-        """
-            Trace messages associated with the object.
-        """
-        return self.__traces
-    
-    def _format_properties_str(self, props_dict):
+        }
+
+    def _format_properties_str(self, props_dict: Dict[str, Any]) -> str:
         obj_props = ""
-        for k,v in props_dict.items():
+        for k, v in props_dict.items():
             k = k.title()
             obj_props += f"{k}: {v}\n"
         return obj_props
 
-    def __str__(self):
+    def __str__(self) -> str:
         obj_props = "Object Properties:\n"
         obj_props += self._format_properties_str(self.meta)
         return obj_props
-    
+
     @staticmethod
-    def merge_properties(tobj1, props_dict):
+    def merge_properties(tobj1: 'TarkashObject', props_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
-            Merge meta-data of the first Tarkash object with the provided dictionary.
+        Merge meta-data of the first Tarkash object with the provided dictionary.
         """
         return {**tobj1.meta, **props_dict}

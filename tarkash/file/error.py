@@ -1,5 +1,5 @@
-# This file is a part of Arjuna
-# Copyright 2015-2021 Rahul Verma
+# This file is a part of Tarkash
+# Copyright 2015-2024 Rahul Verma
 
 # Website: www.RahulVerma.net
 
@@ -23,7 +23,7 @@ from tarkash.core.tobj import TarkashObject
 
 def _format_file_path_msg(fobj):
     file_msg = fobj.path 
-    if fobj.is_relative:
+    if fobj.has_relative_path:
         file_msg = file_msg + f" (with relative path resolved to {fobj.get_canonical_path(fobj.full_path)})" 
     return file_msg
         

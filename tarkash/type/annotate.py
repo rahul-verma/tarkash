@@ -15,16 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+'''
+Tarkash's Custom Type Annotations
 
-import os
-import sys
+These types are used for annotating functions, methods and return types.
 
-def __join_paths(*paths):
-    return os.path.abspath(os.path.join(*paths))
+In future, they could be used to enforce types. For the time being, the purpose is understandability and documentation.
+'''
+from typing import TypeVar
+from .constant import TarkashOption
 
-__root_dir = __join_paths(os.path.dirname(os.path.realpath(__file__)), "..")
-sys.path.insert(0, __root_dir)
-
-from tarkash.core.facade import Tarkash
-from tarkash.track.log import *
-
+ListOrTuple = TypeVar('ListOrTuple', list, tuple)
+ListOrTupleOrStr = TypeVar('ListOrTupleOrStr', list, tuple, str)
+TarkashOptionOrStr = TypeVar('TarkashOptionOrStr', TarkashOption, str)

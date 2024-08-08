@@ -1,5 +1,5 @@
-# This file is a part of Arjuna
-# Copyright 2015-2021 Rahul Verma
+# This file is a part of Tarkash
+# Copyright 2015-2024 Rahul Verma
 
 # Website: www.RahulVerma.net
 

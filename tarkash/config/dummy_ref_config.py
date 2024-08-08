@@ -15,16 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+'''
+This is a dummy reference configuration that is based on environment variables in the project, till this feature is developed and ported from Tarkash.
+'''
+
+from tarkash.type.constant import TarkashOption
 
 import os
-import sys
 
-def __join_paths(*paths):
-    return os.path.abspath(os.path.join(*paths))
-
-__root_dir = __join_paths(os.path.dirname(os.path.realpath(__file__)), "..")
-sys.path.insert(0, __root_dir)
-
-from tarkash.core.facade import Tarkash
-from tarkash.track.log import *
-
+class RefConfig:
+    '''
+        Dummy Reference Configuration
+    '''
+    
+    def value(self, option_name: TarkashOption):
+        return os.environ.get(option_name.name, None)

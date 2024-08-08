@@ -15,16 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import functools
 
-import os
-import sys
+def singleton(cls):
+    @functools.wraps(cls)
+    def inner(*args, **kwargs):
+        if not hasattr(cls, '_INSTANCE') or cls._INSTANCE is None:
+            cls._INSTANCE = cls(*args, **kwargs)
+        return cls._INSTANCE
 
-def __join_paths(*paths):
-    return os.path.abspath(os.path.join(*paths))
-
-__root_dir = __join_paths(os.path.dirname(os.path.realpath(__file__)), "..")
-sys.path.insert(0, __root_dir)
-
-from tarkash.core.facade import Tarkash
-from tarkash.track.log import *
-
+    return inner

@@ -1,5 +1,5 @@
-# This file is a part of Arjuna
-# Copyright 2015-2021 Rahul Verma
+# This file is a part of Tarkash
+# Copyright 2015-2024 Rahul Verma
 
 # Website: www.RahulVerma.net
 
@@ -31,12 +31,6 @@ def create_file_path(parent_path, child_parts, file_name, *, extension=None):
     if extension:
         file_name = file_name + "." + extension
     return os.pathsep.join(dir_path, file_name)
-
-def is_file(path, d=None):
-    p = path
-    if d:
-        p = os.path.join(d, p)
-    return os.path.exists(p) and os.path.isfile(p)
 
 
 def is_dir(path):
