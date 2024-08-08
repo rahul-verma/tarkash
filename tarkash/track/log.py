@@ -136,7 +136,7 @@ class _Logger:
         return self.__logger
 
 
-def __log(invoker, level, *msg, contexts=None):
+def __log(invoker, level, *msg, contexts=None, tobj=None):
     from tarkash import Tarkash
     if type(contexts) is str:
         contexts = (contexts,)
@@ -145,6 +145,8 @@ def __log(invoker, level, *msg, contexts=None):
     contexts = set(contexts)
     try:
         msg = " ".join([str(m).replace('\n', ' ').replace('\r', '') for m in msg])
+        if tobj is not None:
+            tobj.append_trace(msg)
         getattr(Tarkash.get_logger(), level)(msg, extra={'invoker': invoker, 'contexts':contexts})
     except AttributeError as e:
         import traceback
@@ -159,7 +161,7 @@ def __log(invoker, level, *msg, contexts=None):
         else :
             sys.stderr.write(msg+"\n")
 
-def log_trace(*msg: object, contexts: ListOrTupleOrStr=None):
+def log_trace(*msg: object, contexts: ListOrTupleOrStr=None, tobj=None):
     '''
         Log a message with **TRACE** level.
 
@@ -167,54 +169,59 @@ def log_trace(*msg: object, contexts: ListOrTupleOrStr=None):
             msg: Arbitrary Log Message Objects. String representations of all objects are joined using a single blank space.
             contexts: (Optional) Context strings for this log message.
     '''
-    __log(Stack.get_invoker(), "trace", *msg, contexts=contexts)
+    __log(Stack.get_invoker(), "trace", *msg, contexts=contexts, tobj=tobj)
 
-def log_debug(*msg: object, contexts: ListOrTupleOrStr=None) -> None:
+def log_debug(*msg: object, contexts: ListOrTupleOrStr=None, tobj=None) -> None:
     '''
         Log a message with **DEBUG** level.
 
         Args: 
             msg: Arbitrary Log Message Objects. String representations of all objects are joined using a single blank space.
             contexts: (Optional) Context strings for this log message.
+            tobj: A TarkashObject. If provided, the message is appended to traces of this object.
     '''
-    __log(Stack.get_invoker(), "debug", *msg, contexts=contexts)
+    __log(Stack.get_invoker(), "debug", *msg, contexts=contexts, tobj=tobj)
 
-def log_info(*msg: object, contexts: ListOrTupleOrStr=None) -> None:
+def log_info(*msg: object, contexts: ListOrTupleOrStr=None, tobj=None) -> None:
     '''
         Log a message with **INFO** level.
 
         Args: 
             msg: Arbitrary Log Message Objects. String representations of all objects are joined using a single blank space.
             contexts: (Optional) Context strings for this log message.
+            tobj: A TarkashObject. If provided, the message is appended to traces of this object.
     '''
-    __log(Stack.get_invoker(), "info", *msg, contexts=contexts)
+    __log(Stack.get_invoker(), "info", *msg, contexts=contexts, tobj=tobj)
 
-def log_warning(*msg: object, contexts: ListOrTupleOrStr=None) -> None:
+def log_warning(*msg: object, contexts: ListOrTupleOrStr=None, tobj=None) -> None:
     '''
         Log a message with **WARNING** level.
 
         Args: 
             msg: Arbitrary Log Message Objects. String representations of all objects are joined using a single blank space.
             contexts: (Optional) Context strings for this log message.
+            tobj: A TarkashObject. If provided, the message is appended to traces of this object.
     '''
-    __log(Stack.get_invoker(), "warning", *msg, contexts=contexts)
+    __log(Stack.get_invoker(), "warning", *msg, contexts=contexts, tobj=tobj)
 
-def log_error(*msg: object, contexts: ListOrTupleOrStr=None) -> None:
+def log_error(*msg: object, contexts: ListOrTupleOrStr=None, tobj=None) -> None:
     '''
         Log a message with **ERROR** level.
 
         Args: 
             msg: Arbitrary Log Message Objects. String representations of all objects are joined using a single blank space.
             contexts: (Optional) Context strings for this log message.
+            tobj: A TarkashObject. If provided, the message is appended to traces of this object.
     '''
-    __log(Stack.get_invoker(), "error", *msg, contexts=contexts)
+    __log(Stack.get_invoker(), "error", *msg, contexts=contexts, tobj=tobj)
 
-def log_fatal(*msg: object, contexts: ListOrTupleOrStr=None) -> None:
+def log_fatal(*msg: object, contexts: ListOrTupleOrStr=None, tobj=None) -> None:
     '''
         Log a message with **FATAL** level.
 
         Args: 
             msg: Arbitrary Log Message Objects. String representations of all objects are joined using a single blank space.
             contexts: (Optional) Context strings for this log message.
+            tobj: A TarkashObject. If provided, the message is appended to traces of this object.
     '''
-    __log(Stack.get_invoker(), "fatal", *msg, contexts=contexts)
+    __log(Stack.get_invoker(), "fatal", *msg, contexts=contexts, tobj=tobj)

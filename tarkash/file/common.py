@@ -20,6 +20,7 @@ from typing import List, Dict, Any, Optional
 
 from tarkash.core.tobj import TarkashObject
 from tarkash.type.descriptor import *
+from tarkash import log_debug
 
 class File(TarkashObject): 
     _path = String(immutable=True)
@@ -135,36 +136,36 @@ class File(TarkashObject):
         """
         if os.environ.get("PROJECT_ROOT_DIR"):
             base_path = os.environ.get("PROJECT_ROOT_DIR")
-            self._traces.append(f"Found PROJECT_ROOT_DIR environment variable with value: {base_path}.")
+            log_debug(f"Found PROJECT_ROOT_DIR environment variable with value: {base_path}.", tobj=self)
         else:
             base_path = os.getcwd()
-            self._traces.append(f"As PROJECT_ROOT_DIR environment variable is not defined, base path is set to current working directory: {base_path}.")
+            log_debug(f"As PROJECT_ROOT_DIR environment variable is not defined, base path is set to current working directory: {base_path}.", tobj=self)
             
         self._full_path = File.get_canonical_path(os.path.join(base_path, self.path))
     
     def __check_path_exists(self, file_path):
         from .error import IncorrectFilePathError
         if not os.path.exists(self.path): 
-            self._traces.append(f"File path does not exist.")
+            log_debug(f"File path does not exist.", tobj=self)
             if self.should_exist:
                 raise IncorrectFilePathError(self, f"The file does not exist.")
         
     def __determine_file_path(self):
         from .error import IncorrectFilePathError
-        self._traces.append(f"Checking the caller-provided file path >>{self.path}<<")
+        log_debug(f"Checking the caller-provided file path >>{self.path}<<", tobj=self)
         if os.path.isabs(self.path):
             self._full_path = self.path
             self.__check_path_exists(self.path)
         else:
             self._relative = True
-            self._traces.append(f"It's a relative path.")
+            log_debug(f"It's a relative path.", tobj=self)
             if not self._try_relative_path:
                 if self.should_exist:
                     raise IncorrectFilePathError(self, f"Expected absolute path (relative path might be correct but not relevant).")
             else:
-                self._traces.append(f"Converting to absolute path.")
+                log_debug(f"Converting to absolute path.", tobj=self)
                 self.__convert_to_abs_path()
-                self._traces.append(f"Calculated path: >>{self._full_path}<<.")
+                log_debug(f"Calculated path: >>{self._full_path}<<.", tobj=self)
                 self.__check_path_exists(self._full_path)
     
     @staticmethod

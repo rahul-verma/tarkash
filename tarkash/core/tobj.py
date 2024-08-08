@@ -81,3 +81,12 @@ class TarkashObject:
         Merge meta-data of the first Tarkash object with the provided dictionary.
         """
         return {**tobj1.meta, **props_dict}
+    
+    def append_trace(self, message):
+        """
+        Append a trace message to the object.
+        
+        Args:
+            message (str): Message
+        """
+        self._traces.append(message)
