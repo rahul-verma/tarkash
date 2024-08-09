@@ -20,7 +20,12 @@ import os
 from .error import FileIOError
 from .common import File
 
+from tarkash.type.descriptor import *
+from tarkash import log_debug
+
 class FlatFile(File):
+    _path = String(immutable=True)
+    
     """
     Loads a flat text file. Note that the file is read in one go and the contents are stored in memory, at the time of creation of the object.
     
@@ -29,17 +34,18 @@ class FlatFile(File):
         
     Keyword Arguments:
         try_relative_path (bool): If True, file_path is relative to the file where the call is made. Else, it is an absolute path.
-        should_exist(bool): If True, the file should exist. Else, it should not exist.
+        should_exist(bool): If True, the file should exist. Else, it should not exist. Default is True.
         
     Raises:
         IncorrectFilePathError: If the file does not exist.
+        FileIOError: If there is an error reading the file.
     """
-    
-    def __init__(self, file_path: str, *, try_relative_path: bool = True, should_exist=True):
+ 
+    def __init__(self, path, **kwargs):
         """
         Initializes the FlatFileReader with the provided file path and try_relative_path flag.
         """
-        super().__init__(file_path, try_relative_path=try_relative_path, should_exist=should_exist)
+        super().__init__(path, should_exist=True, **kwargs)
         self.__contents = self.__read()
         
     @property
@@ -63,7 +69,7 @@ class FlatFile(File):
             FileIOError: If there is an error reading the file.
         """
         
-        self.traces.append("Attempting to read the file.")
+        log_debug("Attempting to read the file.", tobj=self)
         try:
             with open(self.full_path, 'r') as file:
                 contents = file.read()

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from tarkash.track.log import log_trace
 
 class Validator(ABC):
 
@@ -9,11 +10,11 @@ class Validator(ABC):
         self._assigned = set()
 
     def __get__(self, obj, objtype=None):
-        print(f'__get__ called with obj={repr(obj)}, objtype={objtype}')
+        log_trace(f'__get__ called with obj={repr(obj)}, objtype={objtype}')
         return obj.__dict__[self.private_name]
 
     def __set__(self, obj, value):
-        print(f'__set__ called with obj={repr(obj)}, value={value}')
+        log_trace(f'__set__ called with obj={repr(obj)}, value={value}')
         try:
             if self._immutable and obj in self._assigned:
                 raise AttributeError(f'{self.original_name} is immutable')

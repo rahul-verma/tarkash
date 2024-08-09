@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import os
+import re
 from typing import List, Dict, Any, Optional
 
 from tarkash.core.tobj import TarkashObject
@@ -125,7 +126,7 @@ class File(TarkashObject):
         """
         return os.path.exists(self._full_path) and os.path.isfile(self._full_path)
 
-    def __convert_to_abs_path(self):
+    def __convert_to_abs_path(self, file_path):
         """
         Populate full_path with absolute path.
             
@@ -141,32 +142,49 @@ class File(TarkashObject):
             base_path = os.getcwd()
             log_debug(f"As PROJECT_ROOT_DIR environment variable is not defined, base path is set to current working directory: {base_path}.", tobj=self)
             
-        self._full_path = File.get_canonical_path(os.path.join(base_path, self.path))
-    
-    def __check_path_exists(self, file_path):
-        from .error import IncorrectFilePathError
-        if not os.path.exists(self.path): 
-            log_debug(f"File path does not exist.", tobj=self)
-            if self.should_exist:
-                raise IncorrectFilePathError(self, f"The file does not exist.")
+        log_debug(f"Base path: {base_path}. Relative path: {file_path}", tobj=self)
+        self._full_path = File.get_canonical_path(os.path.join(base_path, file_path))
+            
+    def __remove_pathsep_from_beginning(self, fpath):
+        updated = re.sub(r"^[\\]+(.*)$", r"\1", fpath)
+        updated = re.sub(r"^[/]+(.*)$", r"\1", updated)
+        return updated
         
     def __determine_file_path(self):
         from .error import IncorrectFilePathError
         log_debug(f"Checking the caller-provided file path >>{self.path}<<", tobj=self)
         if os.path.isabs(self.path):
-            self._full_path = self.path
-            self.__check_path_exists(self.path)
-        else:
-            self._relative = True
-            log_debug(f"It's a relative path.", tobj=self)
-            if not self._try_relative_path:
-                if self.should_exist:
-                    raise IncorrectFilePathError(self, f"Expected absolute path (relative path might be correct but not relevant).")
+            log_debug(f"Trying it as an absolute path.", tobj=self)
+            log_debug(self.path)
+            if os.path.exists(self.path):
+                log_debug(f"It's an absolute path.", tobj=self)
+                self._relative = False
+                self._exists = True
+                self._full_path = self.path
+                return
             else:
-                log_debug(f"Converting to absolute path.", tobj=self)
-                self.__convert_to_abs_path()
-                log_debug(f"Calculated path: >>{self._full_path}<<.", tobj=self)
-                self.__check_path_exists(self._full_path)
+                # On Mac and linux the absolute path can start with /
+                # The user can provide / as the beginning of a relative path. In this case os.path.abs returns True which is misleading.
+                file_path = self.__remove_pathsep_from_beginning(self.path)
+                if os.path.isabs(file_path):
+                    self._full_path = file_path
+                    # This can happen on Windows. This is indeed an absolute path which does not exist
+                    log_debug(f"It's an absolute path.", tobj=self)
+                    if self.should_exist:
+                        raise IncorrectFilePathError(self, f"The file does not exist.")
+                    else:
+                        return
+                elif not self._try_relative_path:
+                    raise IncorrectFilePathError(self, f"The absolute path is incorrect (relative path might be correct but not relevant).")
+                    
+        self._relative = True
+        log_debug(f"It's a relative path.", tobj=self)
+        log_debug(f"Converting to absolute path.", tobj=self)
+        self.__convert_to_abs_path(file_path)
+        log_debug(f"Calculated path: >>{self._full_path}<<.", tobj=self)
+        if not os.path.exists(self._full_path):
+            if self.should_exist:
+                raise IncorrectFilePathError(self, f"The file does not exist.")   
     
     @staticmethod
     def get_canonical_path(file_path):

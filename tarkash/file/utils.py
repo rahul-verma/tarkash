@@ -58,7 +58,7 @@ def get_file_modified_time_stamp(path):
     return os.path.getmtime(path)
 
 
-def get_latest_file_pathfrom_dir(path):
+def get_latest_file_path_from_dir(path):
     check = 0
     last = None
     for f in os.listdir(path):

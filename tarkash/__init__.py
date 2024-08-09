@@ -27,4 +27,5 @@ sys.path.insert(0, __root_dir)
 
 from tarkash.core.facade import Tarkash
 from tarkash.track.log import *
+from tarkash.file.format import FlatFile
 
