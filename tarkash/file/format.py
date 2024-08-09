@@ -49,7 +49,7 @@ class FlatFile(File):
         self.__contents = self.__read()
         
     @property
-    def contents(self) -> str:
+    def content(self) -> str:
         """
         Contents of the file.
         
