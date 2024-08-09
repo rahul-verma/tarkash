@@ -151,6 +151,7 @@ class File(TarkashObject):
         return updated
         
     def __determine_file_path(self):
+        updated_path = self.path
         from .error import IncorrectFilePathError
         log_debug(f"Checking the caller-provided file path >>{self.path}<<", tobj=self)
         if os.path.isabs(self.path):
@@ -165,9 +166,9 @@ class File(TarkashObject):
             else:
                 # On Mac and linux the absolute path can start with /
                 # The user can provide / as the beginning of a relative path. In this case os.path.abs returns True which is misleading.
-                file_path = self.__remove_pathsep_from_beginning(self.path)
-                if os.path.isabs(file_path):
-                    self._full_path = file_path
+                updated_path = self.__remove_pathsep_from_beginning(self.path)
+                if os.path.isabs(updated_path):
+                    self._full_path = updated_path
                     # This can happen on Windows. This is indeed an absolute path which does not exist
                     log_debug(f"It's an absolute path.", tobj=self)
                     if self.should_exist:
@@ -180,7 +181,7 @@ class File(TarkashObject):
         self._relative = True
         log_debug(f"It's a relative path.", tobj=self)
         log_debug(f"Converting to absolute path.", tobj=self)
-        self.__convert_to_abs_path(file_path)
+        self.__convert_to_abs_path(updated_path)
         log_debug(f"Calculated path: >>{self._full_path}<<.", tobj=self)
         if not os.path.exists(self._full_path):
             if self.should_exist:
