@@ -19,14 +19,13 @@
 This is a dummy reference configuration that is based on environment variables in the project, till this feature is developed and ported from Tarkash.
 '''
 
-from tarkash.type.constant import TarkashOption
-
 import os
+from enum import Enum
 
 class RefConfig:
     '''
         Dummy Reference Configuration
     '''
     
-    def value(self, option_name: TarkashOption):
-        return os.environ.get(option_name.name, None)
+    def value(self, option_name: Enum):
+        return os.environ[option_name.name]

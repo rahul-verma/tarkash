@@ -30,11 +30,10 @@ class FlatFile(File):
     Loads a flat text file. Note that the file is read in one go and the contents are stored in memory, at the time of creation of the object.
     
     Args:
-        file_path (str): Path to the file. If try_relative_path is True, it is relative to the current working directory.
+        path (str): Path to the file. If try_relative_path is True, it is relative to the current working directory.
         
     Keyword Arguments:
         try_relative_path (bool): If True, file_path is relative to the file where the call is made. Else, it is an absolute path.
-        should_exist(bool): If True, the file should exist. Else, it should not exist. Default is True.
         
     Raises:
         IncorrectFilePathError: If the file does not exist.
@@ -43,7 +42,7 @@ class FlatFile(File):
  
     def __init__(self, path, **kwargs):
         """
-        Initializes the FlatFileReader with the provided file path and try_relative_path flag.
+        Initializes the FlatFile with the provided file path and try_relative_path flag. The file must exist.
         """
         super().__init__(path, should_exist=True, **kwargs)
         self.__contents = self.__read()

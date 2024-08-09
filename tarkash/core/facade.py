@@ -22,12 +22,12 @@ from tarkash.core.adv.decorator import singleton
 class _TarkashSingleton:
     
     def __init__(self):
-        pass
+        from tarkash.config.dummy_ref_config import RefConfig
+        self.__ref_config = RefConfig()
 
     _INITLIASED = False
 
-    def init(self, ref_config):
-        self.__ref_config = ref_config
+    def init(self):
         if self._INITLIASED: return
         
         from dotenv import load_dotenv, find_dotenv
@@ -40,6 +40,9 @@ class _TarkashSingleton:
     @property
     def logger(self):
         return self.__logger.logger
+    
+    def get_option_value(self, option_name):
+        return self.__ref_config.value(option_name)
 
 
 class Tarkash:
@@ -52,9 +55,7 @@ class Tarkash:
     @classmethod
     def init(cls):
         cls._TARKASH_SINGLETON = _TarkashSingleton()
-        
-        from tarkash.config.dummy_ref_config import RefConfig
-        cls._TARKASH_SINGLETON.init(RefConfig())
+        cls._TARKASH_SINGLETON.init()
         
     @classmethod
     def get_logger(cls):
@@ -62,3 +63,10 @@ class Tarkash:
             Returns framework logger.
         '''
         return cls._TARKASH_SINGLETON.logger
+    
+    @classmethod
+    def get_option_value(cls, enum_option):
+        '''
+        Get configured value for an option.
+        '''
+        return cls._TARKASH_SINGLETON.get_option_value(enum_option)
