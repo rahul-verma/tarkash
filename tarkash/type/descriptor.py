@@ -72,3 +72,13 @@ class Boolean(Validator):
     def validate(self, value):
         if not isinstance(value, bool):
             self._raise_type_error(value, 'a bool')
+            
+class Callable(Validator):
+
+    def __init__(self, *, immutable=False):
+        super().__init__()
+        self._immutable = immutable
+
+    def validate(self, value):
+        if not callable(value):
+            self._raise_type_error(value, 'a callable for type conversion')
