@@ -17,8 +17,8 @@
 
 
 class ClassPassThrough:
-    def __init__(self, klass, *cargs, **ckwargs):
-        vars(self)['_o'] = klass(*cargs, **ckwargs)
+    def __init__(self, class_name, *cargs, **ckwargs):
+        vars(self)['_o'] = class_name(*cargs, **ckwargs)
 
     def __getattr__(self, item):
         if item in ['_o', '__lock__']:

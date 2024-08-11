@@ -93,8 +93,7 @@ class _Logger:
         self.__load()
 
     def __load(self):
-        # from Tarkash.tpi.constant import TarkashOption
-        from tarkash.type.constant import TarkashOption
+        from tarkash.core.constant import TarkashOption
         # dl = logging.getLevelName(self.__ref_config.value(TarkashOption.LOG_CONSOLE_LEVEL).name) # logging.getLevelName(
         dl = logging.getLevelName(self.__ref_config.value(TarkashOption.LOG_CONSOLE_LEVEL))
         log_dir = self.__ref_config.value(TarkashOption.LOG_DIR)

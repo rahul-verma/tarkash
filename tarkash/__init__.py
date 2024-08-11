@@ -25,7 +25,14 @@ def __join_paths(*paths):
 __root_dir = __join_paths(os.path.dirname(os.path.realpath(__file__)), "..")
 sys.path.insert(0, __root_dir)
 
+
+# Normal Usage
 from tarkash.core.facade import Tarkash
 from tarkash.track.log import *
 from tarkash.file.format import FlatFile, IniFile, IniConfigFile
 
+
+# Advanced Usage
+from tarkash.core.tobj import TarkashObject
+from tarkash.core.adv.decorator import singleton
+from tarkash.type.descriptor import *

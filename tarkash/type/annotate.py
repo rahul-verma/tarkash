@@ -23,7 +23,7 @@ These types are used for annotating functions, methods and return types.
 In future, they could be used to enforce types. For the time being, the purpose is understandability and documentation.
 '''
 from typing import TypeVar
-from .constant import TarkashOption
+from tarkash.core.constant import TarkashOption
 
 ListOrTuple = TypeVar('ListOrTuple', list, tuple)
 ListOrTupleOrStr = TypeVar('ListOrTupleOrStr', list, tuple, str)

@@ -19,7 +19,6 @@ from typing import List
 
 from tarkash.core.error import TarkashError
 from .common import File
-from tarkash.core.tobj import TarkashObject
 
 def _format_file_path_msg(fobj):
     file_msg = fobj.path 

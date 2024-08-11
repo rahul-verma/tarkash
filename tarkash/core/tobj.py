@@ -15,36 +15,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import annotations
+
 from tarkash.type.descriptor import *
 from typing import List, Dict, Any
+from abc import ABC
 
-class TarkashObject:
-    _purpose: String()
-    _klass: str = String()
-    #_traces: List[str] = PrivateAttr(default_factory=list) 
+class TarkashObject(ABC):
+    _object_name: DString()
+    _class_name: str = DString()
 
-    # class Config:
-    #     arbitrary_types_allowed = True
-
-    def __init__(self, purpose:str = "NOT_SET", **kwargs):
-        self._klass = self.__module__ + "." + self.__class__.__name__
-        self._purpose = purpose
+    def __init__(self, object_name:str = "NOT_SET", **kwargs):
+        self._class_name = self.__module__ + "." + self.__class__.__name__
+        self._object_name = object_name
         self._traces = []
         
     @property
-    def purpose(self) -> str:
+    def object_name(self) -> str:
         """
-        Class of the object.
+        Name of the object for logging purposes.
         """
-        return self._purpose
-        
+        return self._object_name
         
     @property
-    def klass(self) -> str:
+    def class_name(self) -> str:
         """
-        Class of the object.
+        Fully qualified Class name of the object.
         """
-        return self._klass
+        return self._class_name
     
     @property
     def traces(self) -> List[str]:
@@ -59,8 +57,8 @@ class TarkashObject:
         Tarkash Properties of the object as a dictionary.
         """
         return {
-            "purpose": self.purpose,
-            "class": self.klass
+            "object_name": self.object_name,
+            "class": self.class_name
         }
 
     def _format_properties_str(self, props_dict: Dict[str, Any]) -> str:
@@ -76,11 +74,11 @@ class TarkashObject:
         return obj_props
 
     @staticmethod
-    def merge_properties(tobj1: 'TarkashObject', props_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def merge_properties(tobj:TarkashObject, props_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
         Merge meta-data of the first Tarkash object with the provided dictionary.
         """
-        return {**tobj1.meta, **props_dict}
+        return {**tobj.meta, **props_dict}
     
     def append_trace(self, message):
         """

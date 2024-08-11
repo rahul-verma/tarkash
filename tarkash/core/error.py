@@ -40,7 +40,7 @@ class TarkashError(Exception):
         traces = " ".join([append_dot(m.strip()) for m in tobj.traces if m.strip()])
         if traces:
             traces = "Additional Info: " + traces
-        super().__init__(f"{tobj.klass}::{tobj.purpose}:: {message} {traces}")
+        super().__init__(f"{tobj.class_name}::{tobj.object_name}:: {message} {traces}")
 
 
 class CorruptStateError(TarkashError):

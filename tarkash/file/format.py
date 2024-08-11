@@ -23,10 +23,10 @@ from .common import File
 from tarkash.type.descriptor import *
 from tarkash import log_debug
 
-from typing import Any
+from typing import Any, Callable
 
 class FlatFile(File):
-    _path = String(immutable=True)
+    _path = DString(immutable=True)
     
     """
     Loads a flat text file. Note that the file is read in one go and the contents are stored in memory, at the time of creation of the object.
@@ -79,13 +79,12 @@ class FlatFile(File):
             raise FileIOError(self, f"An error occurred while reading the file: {e}")
 
 from tarkash.data.processor import StringsJoiner
-
 string_joiner = StringsJoiner(delimiter="\n")
 
 class IniFile(File):
     
-    _path = String(immutable=True)
-    _content_type = Callable
+    _path = DString(immutable=True)
+    _content_type = DCallable
     
     """
     Loads an INI file. Note that the file is read in one go and the contents are stored in memory, at the time of creation of the object.
@@ -101,7 +100,7 @@ class IniFile(File):
         FileIOError: If there is an error reading the file.
     """
  
-    def __init__(self, path, content_processor:Callable=string_joiner, **kwargs):
+    def __init__(self, path, content_processor:Callable= string_joiner, **kwargs):
         """
         Initializes the IniFile with the provided file path and try_relative_path flag. The file must exist.
         
@@ -192,7 +191,7 @@ strings_to_dict = StringsToDictConverter(delimiter='=')
 
 class IniConfigFile(IniFile):
     
-    _path = String(immutable=True)
+    _path = DString(immutable=True)
     _content_type = Callable
     
     """

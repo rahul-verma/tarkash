@@ -24,9 +24,9 @@ from tarkash.type.descriptor import *
 from tarkash import log_debug
 
 class File(TarkashObject): 
-    _path = String(immutable=True)
-    _try_relative_path = Boolean(immutable=True)
-    _should_exist = Boolean(immutable=True)
+    _path = DString(immutable=True)
+    _try_relative_path = DBoolean(immutable=True)
+    _should_exist = DBoolean(immutable=True)
     
     """
     
