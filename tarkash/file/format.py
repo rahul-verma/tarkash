@@ -18,14 +18,14 @@
 import os, copy
 
 from .error import FileIOError
-from .common import File
+from .common import FileContent
 
 from tarkash.type.descriptor import *
 from tarkash import log_debug
 
 from typing import Any, Callable
 
-class FlatFile(File):
+class FlatFile(FileContent):
     _path = DString(immutable=True)
     
     """
@@ -78,10 +78,10 @@ class FlatFile(File):
         except FileIOError as e:
             raise FileIOError(self, f"An error occurred while reading the file: {e}")
 
-from tarkash.data.processor import StringsJoiner
+from tarkash.data.process import StringsJoiner
 string_joiner = StringsJoiner(delimiter="\n")
 
-class IniFile(File):
+class IniFile(FileContent):
     
     _path = DString(immutable=True)
     _content_type = DCallable
@@ -186,7 +186,7 @@ class IniFile(File):
         self.__closed = True
         del self.__f
 
-from tarkash.data.processor import StringsToDictConverter
+from tarkash.data.process import StringsToDictConverter
 strings_to_dict = StringsToDictConverter(delimiter='=')
 
 class IniConfigFile(IniFile):
@@ -217,3 +217,57 @@ class IniConfigFile(IniFile):
         You can iterate over the sections of the file using the object.
         """
         super().__init__(path, content_processor=content_processor, **kwargs)
+        
+class ImageFile(FileContent):
+    
+    _path = DString(immutable=True)
+    
+    """
+    Loads an image file. Note that the file is read in one go and the contents are stored in memory, at the time of creation of the object.
+    
+    Args:
+        path (str): Path to the file. If try_relative_path is True, it is relative to the current working directory.
+        
+    Keyword Arguments:
+        try_relative_path (bool): If True, file_path is relative to the file where the call is made. Else, it is an absolute path.
+        
+    Raises:
+        IncorrectFilePathError: If the file does not exist.
+        FileIOError: If there is an error reading the file.
+    """
+ 
+    def __init__(self, path, **kwargs):
+        """
+        Initializes the ImageFile with the provided file path and try_relative_path flag. The file must exist.
+        """
+        super().__init__(path, should_exist=True, **kwargs)
+        self.__contents = self.__read()
+        
+    @property
+    def content(self) -> str:
+        """
+        Contents of the file.
+        
+        Returns:
+            str: Contents of the file.
+        """
+        return self.__contents
+    
+    def __read(self) -> str:
+        """
+        Reads the contents of the file.
+        
+        Returns:
+            str: The contents of the file as a string.
+        
+        Raises:
+            FileIOError: If there is an error reading the file.
+        """
+        
+        log_debug("Attempting to read the file.", tobj=self)
+        try:
+            with open(self.full_path, 'rb') as file:
+                contents = file.read()
+            return contents
+        except FileIOError as e:
+            raise FileIOError(self, f"An error occurred while reading the file: {e}")

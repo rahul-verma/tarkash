@@ -15,24 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import os
-import sys
-
-def __join_paths(*paths):
-    return os.path.abspath(os.path.join(*paths))
-
-__root_dir = __join_paths(os.path.dirname(os.path.realpath(__file__)), "..")
-sys.path.insert(0, __root_dir)
+import base64
+from typing import Any, Union
+from tarkash.file.common import File
 
 
-# Normal Usage
-from tarkash.core.facade import Tarkash
-from tarkash.track.log import *
-from tarkash.file.format import FlatFile, IniFile, IniConfigFile, ImageFile
-
-
-# Advanced Usage
-from tarkash.core.tobj import TarkashObject
-from tarkash.core.adv.decorator import singleton
-from tarkash.type.descriptor import *
+class Base64:
+    
+    @staticmethod
+    def encode(data: Union[File, str, bytes]) -> str:
+        return base64.b64encode(data).decode("utf-8")

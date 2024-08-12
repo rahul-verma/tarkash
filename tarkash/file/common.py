@@ -22,6 +22,7 @@ from typing import List, Dict, Any, Optional
 from tarkash.core.tobj import TarkashObject
 from tarkash.type.descriptor import *
 from tarkash import log_debug
+from abc import ABC
 
 class File(TarkashObject): 
     _path = DString(immutable=True)
@@ -210,3 +211,65 @@ class File(TarkashObject):
             "exists": self.exists
         })
         return props
+    
+    @property
+    def mime_type(self) -> str:
+        """
+        Determines the MIME type of the file.
+
+        Raises:
+            ValueError: If the MIME type cannot be determined.
+
+        Returns:
+            str: MIME type of the file.
+        """
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(self.full_path)
+
+        if mime_type is None:
+            raise ValueError("Could not determine the MIME type of the file.")
+        return mime_type
+    
+class FileContent(File,ABC):
+    _path = DString(immutable=True)
+    
+    """
+    Loads a flat text file. Note that the file is read in one go and the contents are stored in memory, at the time of creation of the object.
+    
+    Args:
+        path (str): Path to the file. If try_relative_path is True, it is relative to the current working directory.
+        
+    Keyword Arguments:
+        try_relative_path (bool): If True, file_path is relative to the file where the call is made. Else, it is an absolute path.
+        
+    Raises:
+        IncorrectFilePathError: If the file does not exist.
+        FileIOError: If there is an error reading the file.
+    """
+ 
+    def __init__(self, path, **kwargs):
+        """
+        Initializes the FlatFile with the provided file path and try_relative_path flag. The file must exist.
+        """
+        super().__init__(path, **kwargs)
+        
+    @property
+    def as_base64_encoded(self) -> str:
+        """
+        Base-64 Encoded contents of the file.
+        
+        Returns:
+            str: Base-64 Encoded contents of the file.
+        """
+        from tarkash.data.encode import Base64
+        return Base64.encode(self.content)
+
+    @property
+    def as_data_url(self):
+        """
+        The file content as a data URL.
+
+        Returns:
+            str: File content as a Data URL
+        """
+        return f"data:{self.mime_type};base64,{self.as_base64_encoded}"
