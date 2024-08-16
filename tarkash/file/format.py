@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import os, copy
+import yaml
 
 from .error import FileIOError
 from .common import FileContent
@@ -74,6 +75,61 @@ class FlatFile(FileContent):
         try:
             with open(self.full_path, 'r') as file:
                 contents = file.read()
+            return contents
+        except FileIOError as e:
+            raise FileIOError(self, f"An error occurred while reading the file: {e}")
+        
+class YamlFile(FileContent):
+    
+    _path = DString(immutable=True)
+    
+    """
+    Loads a YAML file. Note that the file is read in one go and the contents are stored in memory, at the time of creation of the object.
+    
+    Args:
+        path (str): Path to the file. If try_relative_path is True, it is relative to the current working directory.
+        
+    Keyword Arguments:
+        try_relative_path (bool): If True, file_path is relative to the file where the call is made. Else, it is an absolute path.
+        
+    Raises:
+        IncorrectFilePathError: If the file does not exist.
+        FileIOError: If there is an error reading the file.
+    """
+ 
+    def __init__(self, path, **kwargs):
+        """
+        Initializes the YamlFile with the provided file path and try_relative_path flag. The file must exist.
+        """
+        super().__init__(path, should_exist=True, **kwargs)
+        self.__contents = self.__read()
+        
+    @property
+    def content(self) -> dict:
+        """
+        Contents of the file.
+        
+        Returns:
+            dict: Contents of the file.
+        """
+        return self.__contents
+    
+    def __read(self) -> dict:
+        """
+        Reads the contents of the file.
+        
+        Returns:
+            dict: The contents of the file as a dictionary.
+        
+        Raises:
+            FileIOError: If there is an error reading the file.
+        """
+        
+        log_debug("Attempting to read the file.", tobj=self)
+        try:
+            import yaml
+            with open(self.full_path, 'r') as file:
+                contents = yaml.safe_load(file)
             return contents
         except FileIOError as e:
             raise FileIOError(self, f"An error occurred while reading the file: {e}")
