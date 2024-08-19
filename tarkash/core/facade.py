@@ -26,7 +26,7 @@ class _TarkashSingleton:
 
     _INITLIASED = False
 
-    def init(self, project_root_dir:str=None):
+    def init(self, project_dir:str=None):
         if self._INITLIASED: return
         
         from dotenv import load_dotenv, find_dotenv
@@ -34,13 +34,13 @@ class _TarkashSingleton:
         
         self._INITLIASED = True
         
-        if project_root_dir is None:
-            project_root_dir = os.environ["PROJECT_ROOT_DIR"]
+        if project_dir is None:
+            project_dir = os.environ["PROJECT_DIR"]
         from tarkash.config.dummy_ref_config import RefConfig
-        self.__ref_config = RefConfig(project_root_dir)
+        self.__ref_config = RefConfig(project_dir)
         
         # Making project importable
-        sys.path.append(os.path.join(project_root_dir, ".."))
+        sys.path.append(os.path.join(project_dir, ".."))
         
         from tarkash.track.log import _Logger
         self.__logger = _Logger(self.__ref_config)

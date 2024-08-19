@@ -133,15 +133,15 @@ class File(TarkashObject):
             
         Note:
             If base_path is not provided, it will be considered in the following order:
-            1. If defined, from PROJECT_ROOT_DIR environment variable.
+            1. If defined, from PROJECT_DIR environment variable.
             2. Current working directory.
         """
-        if os.environ.get("PROJECT_ROOT_DIR"):
-            base_path = os.environ.get("PROJECT_ROOT_DIR")
-            log_debug(f"Found PROJECT_ROOT_DIR environment variable with value: {base_path}.", tobj=self)
+        if os.environ.get("PROJECT_DIR"):
+            base_path = os.environ.get("PROJECT_DIR")
+            log_debug(f"Found PROJECT_DIR environment variable with value: {base_path}.", tobj=self)
         else:
             base_path = os.getcwd()
-            log_debug(f"As PROJECT_ROOT_DIR environment variable is not defined, base path is set to current working directory: {base_path}.", tobj=self)
+            log_debug(f"As PROJECT_DIR environment variable is not defined, base path is set to current working directory: {base_path}.", tobj=self)
             
         log_debug(f"Base path: {base_path}. Relative path: {file_path}", tobj=self)
         self._full_path = File.get_canonical_path(os.path.join(base_path, file_path))

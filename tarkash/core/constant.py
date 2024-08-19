@@ -70,7 +70,7 @@ class TarkashOption(Enum):
     PROJECT_NAME = auto()
     '''Test Project Name'''
 
-    PROJECT_ROOT_DIR = auto()
+    PROJECT_DIR = auto()
     '''Test Project Root Directory'''
 
     CONF_PROJECT_FILE = auto()
