@@ -15,25 +15,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import os, sys
 from tarkash.core.adv.decorator import singleton
 
 @singleton
 class _TarkashSingleton:
     
     def __init__(self):
-        from tarkash.config.dummy_ref_config import RefConfig
-        self.__ref_config = RefConfig()
+        pass
 
     _INITLIASED = False
 
-    def init(self):
+    def init(self, project_root_dir:str=None):
         if self._INITLIASED: return
         
         from dotenv import load_dotenv, find_dotenv
         _ = load_dotenv(find_dotenv()) # read local .env file
         
         self._INITLIASED = True
+        
+        if project_root_dir is None:
+            project_root_dir = os.environ["PROJECT_ROOT_DIR"]
+        from tarkash.config.dummy_ref_config import RefConfig
+        self.__ref_config = RefConfig(project_root_dir)
+        
+        # Making project importable
+        sys.path.append(os.path.join(project_root_dir, ".."))
+        
         from tarkash.track.log import _Logger
         self.__logger = _Logger(self.__ref_config)
         
@@ -43,6 +51,12 @@ class _TarkashSingleton:
     
     def get_option_value(self, option_name):
         return self.__ref_config.value(option_name)
+    
+    def get_ref_config(self):
+        return self.__ref_config
+    
+    def register_framework_config_defaults(self, prefix, config):
+        self.__ref_config.register_framework_config_defaults(prefix, config)
 
 
 class Tarkash:
@@ -51,6 +65,12 @@ class Tarkash:
         Contains static methods which wrapper an internal singleton class for easy access to top level Tarkash functions.
     '''
     _TARKASH_SINGLETON = None
+    
+    @classmethod
+    def _TWrapper(cls):
+        if cls._TARKASH_SINGLETON is None:
+            raise ValueError("Tarkash has not been initialized.")
+        return cls._TARKASH_SINGLETON
     
     @classmethod
     def init(cls):
@@ -62,11 +82,27 @@ class Tarkash:
         '''
             Returns framework logger.
         '''
-        return cls._TARKASH_SINGLETON.logger
+        return cls._TWrapper().logger
     
     @classmethod
     def get_option_value(cls, enum_option):
         '''
         Get configured value for an option.
         '''
-        return cls._TARKASH_SINGLETON.get_option_value(enum_option)
+        return cls._TWrapper().get_option_value(enum_option)
+    
+    @classmethod
+    def register_framework_config_defaults(cls, prefix, config):
+        '''
+        Register default values for framework configuration.
+        '''
+        if type(prefix) is not str or not prefix:
+            raise ValueError("Prefix should be a string and not empty.")
+        elif type(config) is not dict or not config:
+            raise ValueError("Config should be a dictionary and not empty.")
+        else:
+            cls._TWrapper().register_framework_config_defaults(prefix,config)
+    
+    @classmethod
+    def get_ref_config(cls):
+        return cls._TWrapper().get_ref_config()

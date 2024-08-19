@@ -26,6 +26,25 @@ class RefConfig:
     '''
         Dummy Reference Configuration
     '''
+    def __init__(self, project_dir: str):
+        self.__config = {"PROJECT_NAME": os.path.basename(project_dir), 
+                         "PROJECT_ROOT_DIR": project_dir,
+                         "LOG_CONSOLE_LEVEL": "INFO",
+                         "LOG_FILE_LEVEL": "DEBUG",
+                         "LOG_DIR": f"{project_dir}/log"
+        }
     
-    def value(self, option_name: Enum):
-        return os.environ[option_name.name]
+    def value(self, option: Enum):
+        if option.name in ("PROJECT_NAME", "PROJECT_ROOT_DIR"):
+            return self.__config[option.name]
+        try:
+            return os.environ[option.name]
+        except:
+            return self.__config[option.name]
+    
+    def register_framework_config_defaults(self, prefix, config):
+        for k,v in config.items():
+            if type(config) is tuple:
+                self.__config[k] = f"{self.value['PROJECT_ROOT_DIR']}/{v}"
+            else:
+                self.__config[k] = v

@@ -86,8 +86,8 @@ class _Logger:
 
     def __init__(self, ref_config):
         # For now we use environment variables.
-        from tarkash.config.dummy_ref_config import RefConfig
-        self.__ref_config = RefConfig()
+        from tarkash import Tarkash
+        self.__ref_config = Tarkash.get_ref_config()
         self.__add_trace_level()
         self.__logger = None
         self.__load()
