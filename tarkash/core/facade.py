@@ -36,7 +36,7 @@ class _TarkashSingleton:
         
         if project_dir is None:
             project_dir = os.environ["PROJECT_DIR"]
-        from tarkash.config.dummy_ref_config import RefConfig
+        from tarkash.config.ref_config import RefConfig
         self.__ref_config = RefConfig(project_dir)
         
         # Making project importable

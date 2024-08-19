@@ -31,7 +31,8 @@ class RefConfig:
                          "PROJECT_DIR": project_dir,
                          "LOG_CONSOLE_LEVEL": "INFO",
                          "LOG_FILE_LEVEL": "DEBUG",
-                         "LOG_DIR": f"{project_dir}/log"
+                         "LOG_DIR": f"{project_dir}/log",
+                         "REPORT_DIR": f"{project_dir}/report",
         }
     
     def value(self, option: Enum):
@@ -44,7 +45,7 @@ class RefConfig:
     
     def register_framework_config_defaults(self, prefix, config):
         for k,v in config.items():
-            if type(config) is tuple:
-                self.__config[k] = f"{self.value['PROJECT_DIR']}/{v}"
+            if type(v) in (tuple,list):
+                self.__config[k] = f"{self.__config['PROJECT_DIR']}/{v[0]}"
             else:
                 self.__config[k] = v
