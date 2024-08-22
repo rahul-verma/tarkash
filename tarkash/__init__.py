@@ -29,6 +29,7 @@ sys.path.insert(0, __root_dir)
 # Normal Usage
 from tarkash.core.facade import Tarkash
 from tarkash.track.log import *
+from tarkash.file.common import File, Directory
 from tarkash.file.format import FlatFile, IniFile, IniConfigFile, ImageFile, YamlFile
 
 

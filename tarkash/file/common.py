@@ -13,7 +13,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# limitations under the License.`
 
 import os
 import re
@@ -56,6 +56,14 @@ class File(TarkashObject):
         self._relative = False
         self._full_path = "NOT_SET"
         self.__determine_file_path()
+        self._validate_file_or_dir()
+        
+    def _validate_file_or_dir(self):
+        if not self._should_exist:
+            return True
+        
+        if not os.path.isfile(self.full_path):
+            raise ValueError(f"This is not a file: {self.full_path}")
         
     @property
     def path(self):
@@ -229,6 +237,19 @@ class File(TarkashObject):
         if mime_type is None:
             raise ValueError("Could not determine the MIME type of the file.")
         return mime_type
+    
+class Directory(File):
+    _path = DString(immutable=True)
+    
+    def __init__(self, path, **kwargs):
+        super().__init__(path, **kwargs)
+        
+    def _validate_file_or_dir(self):
+        if not self.should_exist:
+            return True
+        
+        if not os.path.isdir(self.full_path):
+            raise ValueError(f"This is not a directory: {self.full_path}")
     
 class FileContent(File,ABC):
     _path = DString(immutable=True)

@@ -73,7 +73,7 @@ class FlatFile(FileContent):
         
         log_debug("Attempting to read the file.", tobj=self)
         try:
-            with open(self.full_path, 'r') as file:
+            with open(self.full_path, 'r', encoding='utf-8') as file:
                 contents = file.read()
             return contents
         except FileIOError as e:
