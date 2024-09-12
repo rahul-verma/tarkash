@@ -46,6 +46,12 @@ class RefConfig:
     def register_framework_config_defaults(self, prefix, config):
         for k,v in config.items():
             if type(v) in (tuple,list):
-                self.__config[k] = f"{self.__config['PROJECT_DIR']}/{v[0]}"
+                if v[1] == "project_relative_path":
+                    absolute_path = f"{self.__config['PROJECT_DIR']}/{v[0]}"
+                    self.__config[k] = absolute_path
+                elif v[1] == "absolute_path":
+                    self.__config[k] = v[0]
+                else:
+                    raise ValueError(f"Unrecognized config value type. {v[1]}")
             else:
                 self.__config[k] = v
